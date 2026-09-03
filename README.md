@@ -47,6 +47,13 @@ export ANTHROPIC_API_KEY="your-api-key"
 
 ## Usage
 
+### Web Interface (Recommended)
+```bash
+streamlit run app.py
+```
+Visit `http://localhost:8501` in your browser
+
+### Python API
 ```python
 from src.workflows.financial_advisor import create_financial_advisor
 
@@ -60,6 +67,16 @@ result = advisor.invoke({
     "risk_tolerance": "moderate"
 })
 ```
+
+## Streamlit Features
+
+- **Dashboard**: Quick financial metrics and summaries
+- **Interactive Analysis**: Input your financial profile and get instant recommendations
+- **Multi-tab Results**: Portfolio, Retirement, Risk, and Recommendations views
+- **Export Data**: Download analysis as JSON
+- **Responsive Design**: Works on desktop and mobile
+
+For deployment instructions, see [STREAMLIT_DEPLOYMENT.md](STREAMLIT_DEPLOYMENT.md)
 
 ## License
 
