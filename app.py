@@ -2,7 +2,13 @@
 import streamlit as st
 import json
 from datetime import datetime
-from src.workflows.financial_advisor import create_financial_advisor
+import os
+from dotenv import load_dotenv
+
+# Load environment
+load_dotenv()
+
+# Import financial tools
 from src.tools.financial_tools import (
     calculate_retirement_needs,
     calculate_portfolio_allocation,
@@ -212,6 +218,78 @@ def display_analysis_results(results):
             st.write(recommendation.get("recommendation", "No recommendations available"))
 
 
+def generate_basic_analysis(profile):
+    """Generate basic analysis without full LangGraph."""
+    allocation = calculate_portfolio_allocation(
+        profile["annual_income"],
+        profile["risk_tolerance"],
+        5
+    )
+
+    retirement_needs = calculate_retirement_needs(
+        profile["age"],
+        65,
+        profile["annual_income"] * 0.7
+    )
+
+    projection = estimate_retirement_income(
+        profile["current_savings"],
+        profile["annual_income"] * 0.15,
+        65 - profile["age"]
+    )
+
+    dti = assess_debt_to_income_ratio(
+        profile["annual_income"],
+        profile["debt"] / 12
+    )
+
+    return {
+        "user_profile": profile,
+        "portfolio_analysis": {
+            "allocation": allocation,
+            "assets": [
+                {"symbol": "VTI", "name": "Total Stock Market ETF", "sector": "Equities"},
+                {"symbol": "BND", "name": "Total Bond Market ETF", "sector": "Fixed Income"},
+                {"symbol": "VEA", "name": "Developed Markets ETF", "sector": "International"}
+            ]
+        },
+        "retirement_plan": {
+            "retirement_age": 65,
+            "retirement_needs": retirement_needs,
+            "projected_balance": projection.get("projected_balance"),
+            "annual_income_at_retirement": projection.get("annual_income_4pct_rule"),
+            "status": "on_track" if projection.get("projected_balance", 0) >= retirement_needs else "needs_improvement"
+        },
+        "risk_assessment": {
+            "debt_to_income_ratio": dti.get("ratio"),
+            "debt_assessment": dti.get("rating"),
+            "emergency_fund_target": calculate_emergency_fund(profile["annual_income"] / 12),
+            "emergency_fund_status": "adequate" if profile["current_savings"] >= calculate_emergency_fund(profile["annual_income"] / 12) else "needs_improvement",
+            "overall_risk_level": "moderate"
+        },
+        "final_recommendation": {
+            "recommendation": f"""
+Based on your profile:
+- Age: {profile['age']}, Income: ${profile['annual_income']:,.0f}
+- Current Savings: ${profile['current_savings']:,.0f}, Debt: ${profile['debt']:,.0f}
+
+**Key Recommendations:**
+1. **Portfolio Allocation**: {allocation}
+2. **Retirement Planning**: You need ${retirement_needs:,.0f} by age 65
+3. **Debt Management**: Your debt-to-income ratio is {dti.get('ratio'):.1%} ({dti.get('rating')})
+4. **Emergency Fund**: Target ${calculate_emergency_fund(profile['annual_income'] / 12):,.0f}
+
+**Action Items (Next 90 Days):**
+- Build emergency fund to 6 months of expenses
+- Set up automatic contributions to retirement accounts
+- Review and reduce high-interest debt
+- Rebalance portfolio quarterly
+            """,
+            "confidence": "medium"
+        }
+    }
+
+
 def main():
     """Main Streamlit app."""
     initialize_session_state()
@@ -287,6 +365,14 @@ def analysis_page():
             st.session_state.show_results = True
             with st.spinner("Analyzing your financial profile..."):
                 try:
+                    # Check if API key is set
+                    if not os.getenv("ANTHROPIC_API_KEY"):
+                        st.error("⚠️ ANTHROPIC_API_KEY not set. Please set your API key in the environment.")
+                        return
+
+                    # Import LangGraph workflow
+                    from src.workflows.financial_advisor import create_financial_advisor
+
                     advisor = create_financial_advisor()
                     state = {
                         "user_profile": profile,
@@ -297,9 +383,14 @@ def analysis_page():
                     }
                     results = advisor.invoke(state)
                     st.session_state.analysis_results = results
-                    st.success("Analysis complete!")
+                    st.success("✅ Analysis complete!")
+                except ImportError as e:
+                    st.warning(f"⚠️ LangGraph not fully loaded: {str(e)}\n\nTrying basic analysis...")
+                    # Fall back to basic analysis
+                    st.session_state.analysis_results = generate_basic_analysis(profile)
+                    st.success("✅ Basic analysis complete!")
                 except Exception as e:
-                    st.error(f"Error during analysis: {str(e)}")
+                    st.error(f"❌ Error during analysis: {str(e)}")
 
     with col2:
         if st.button("🔄 Reset", use_container_width=True):

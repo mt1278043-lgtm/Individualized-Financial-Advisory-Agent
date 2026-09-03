@@ -3,10 +3,15 @@ import os
 import sys
 
 # Add the project directory to the path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+project_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, project_dir)
 
-# Import and run the app
-from app import main
-
-if __name__ == "__main__":
+try:
+    # Try to run the full app
+    from app import main
     main()
+except Exception as e:
+    # Fallback to basic error handling
+    import streamlit as st
+    st.error(f"Error loading app: {str(e)}")
+    st.info("Please ensure ANTHROPIC_API_KEY is set in Streamlit secrets.")

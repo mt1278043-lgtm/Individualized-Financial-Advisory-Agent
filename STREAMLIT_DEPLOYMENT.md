@@ -87,16 +87,64 @@ docker run -p 8501:8501 -e ANTHROPIC_API_KEY="your-key" financial-advisor
 
 ## Troubleshooting
 
+### Error: "installer returned a non-zero exit code"
+
+**Solution 1: Update requirements.txt**
+```bash
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt --no-cache-dir
+```
+
+**Solution 2: Clear Streamlit cache**
+```bash
+streamlit cache clear
+rm -rf ~/.streamlit/
+```
+
+**Solution 3: Recreate virtual environment**
+```bash
+python -m venv venv
+source venv/bin/activate  # or `venv\Scripts\activate` on Windows
+pip install -r requirements.txt
+```
+
 ### Import Error: No module named 'src'
-Make sure you're running from the project root directory.
+Make sure you're running from the project root directory:
+```bash
+cd /path/to/Individualized-Financial-Advisory-Agent
+streamlit run app.py
+```
 
 ### API Key not found
-Ensure `ANTHROPIC_API_KEY` is set in your environment or `.env` file.
+**Local Development:**
+```bash
+export ANTHROPIC_API_KEY="your-api-key-here"
+streamlit run app.py
+```
 
-### Streamlit not responding
+**Streamlit Cloud:**
+1. Go to your app settings
+2. Click "Secrets"
+3. Add:
+```toml
+ANTHROPIC_API_KEY = "your-api-key-here"
+```
+
+### LangGraph Import Error
+The app has a fallback to basic analysis if LangGraph isn't fully loaded. This is normal and the app will still work.
+
+### Streamlit Not Responding
 Try clearing cache:
 ```bash
 streamlit cache clear
+rm -rf .streamlit/
+```
+
+### ModuleNotFoundError with dependencies
+Try installing with more specific versions:
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt --no-deps
 ```
 
 ## Performance Notes
