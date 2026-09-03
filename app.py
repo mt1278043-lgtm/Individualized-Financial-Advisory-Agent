@@ -8,14 +8,62 @@ from dotenv import load_dotenv
 # Load environment
 load_dotenv()
 
-# Import financial tools
-from src.tools.financial_tools import (
-    calculate_retirement_needs,
-    calculate_portfolio_allocation,
-    assess_debt_to_income_ratio,
-    estimate_retirement_income,
-    calculate_emergency_fund
-)
+# Financial calculation functions
+def calculate_retirement_needs(current_age, retirement_age, annual_expenses, inflation_rate=0.03):
+    """Calculate retirement savings needed."""
+    import math
+    years_to_retirement = retirement_age - current_age
+    life_expectancy = 90
+    retirement_years = life_expectancy - retirement_age
+    future_expenses = annual_expenses * math.pow(1 + inflation_rate, years_to_retirement)
+    return future_expenses * retirement_years
+
+def calculate_portfolio_allocation(annual_income, risk_tolerance, years_to_goal):
+    """Calculate recommended portfolio allocation."""
+    allocations = {
+        "conservative": {"stocks": 0.30, "bonds": 0.60, "cash": 0.10},
+        "moderate": {"stocks": 0.60, "bonds": 0.30, "cash": 0.10},
+        "aggressive": {"stocks": 0.80, "bonds": 0.15, "cash": 0.05}
+    }
+    return allocations.get(risk_tolerance.lower(), allocations["moderate"])
+
+def assess_debt_to_income_ratio(annual_income, monthly_debt):
+    """Assess debt-to-income ratio."""
+    monthly_income = annual_income / 12
+    dti_ratio = monthly_debt / monthly_income if monthly_income > 0 else 0
+    if dti_ratio <= 0.15:
+        rating = "excellent"
+    elif dti_ratio <= 0.25:
+        rating = "good"
+    elif dti_ratio <= 0.35:
+        rating = "acceptable"
+    else:
+        rating = "concerning"
+    return {
+        "ratio": dti_ratio,
+        "percentage": dti_ratio * 100,
+        "rating": rating,
+    }
+
+def estimate_retirement_income(current_savings, annual_contribution, years_to_retirement, annual_return=0.07):
+    """Estimate retirement income potential."""
+    import math
+    future_value = current_savings * math.pow(1 + annual_return, years_to_retirement)
+    if annual_return > 0:
+        contribution_value = annual_contribution * ((math.pow(1 + annual_return, years_to_retirement) - 1) / annual_return)
+    else:
+        contribution_value = annual_contribution * years_to_retirement
+    total_value = future_value + contribution_value
+    annual_income_4pct = total_value * 0.04
+    return {
+        "projected_balance": total_value,
+        "annual_income_4pct_rule": annual_income_4pct,
+        "monthly_income": annual_income_4pct / 12
+    }
+
+def calculate_emergency_fund(monthly_expenses, months=6):
+    """Calculate emergency fund size."""
+    return monthly_expenses * months
 
 
 # Page configuration
@@ -366,31 +414,55 @@ def analysis_page():
             with st.spinner("Analyzing your financial profile..."):
                 try:
                     # Check if API key is set
-                    if not os.getenv("ANTHROPIC_API_KEY"):
-                        st.error("⚠️ ANTHROPIC_API_KEY not set. Please set your API key in the environment.")
+                    api_key = os.getenv("ANTHROPIC_API_KEY")
+                    if not api_key:
+                        st.error("⚠️ ANTHROPIC_API_KEY not found!\n\n**To add it:**\n\n1. **Streamlit Cloud**: Go to App settings → Secrets → Add ANTHROPIC_API_KEY\n2. **Local**: Set `export ANTHROPIC_API_KEY='your-key'` in terminal")
                         return
 
-                    # Import LangGraph workflow
-                    from src.workflows.financial_advisor import create_financial_advisor
+                    # Try to use full AI analysis with Anthropic
+                    try:
+                        from anthropic import Anthropic
+                        client = Anthropic(api_key=api_key)
 
-                    advisor = create_financial_advisor()
-                    state = {
-                        "user_profile": profile,
-                        "portfolio_analysis": {},
-                        "retirement_plan": {},
-                        "risk_assessment": {},
-                        "final_recommendation": {}
-                    }
-                    results = advisor.invoke(state)
+                        prompt = f"""
+Analyze this financial profile and provide recommendations:
+
+Name: {profile['name']}
+Age: {profile['age']}
+Annual Income: ${profile['annual_income']:,.0f}
+Current Savings: ${profile['current_savings']:,.0f}
+Total Debt: ${profile['debt']:,.0f}
+Risk Tolerance: {profile['risk_tolerance']}
+
+Provide:
+1. Portfolio allocation recommendation
+2. Retirement needs analysis
+3. Risk assessment
+4. Top 3 action items
+
+Be concise and specific.
+                        """
+
+                        message = client.messages.create(
+                            model="claude-3-5-sonnet-20241022",
+                            max_tokens=1024,
+                            messages=[{"role": "user", "content": prompt}]
+                        )
+
+                        ai_recommendation = message.content[0].text
+                        results = generate_basic_analysis(profile)
+                        results["final_recommendation"]["recommendation"] = ai_recommendation
+                        results["final_recommendation"]["confidence"] = "high"
+
+                    except Exception:
+                        # Fall back to basic analysis
+                        results = generate_basic_analysis(profile)
+                        results["final_recommendation"]["confidence"] = "medium"
+
                     st.session_state.analysis_results = results
                     st.success("✅ Analysis complete!")
-                except ImportError as e:
-                    st.warning(f"⚠️ LangGraph not fully loaded: {str(e)}\n\nTrying basic analysis...")
-                    # Fall back to basic analysis
-                    st.session_state.analysis_results = generate_basic_analysis(profile)
-                    st.success("✅ Basic analysis complete!")
                 except Exception as e:
-                    st.error(f"❌ Error during analysis: {str(e)}")
+                    st.error(f"❌ Error: {str(e)}")
 
     with col2:
         if st.button("🔄 Reset", use_container_width=True):
