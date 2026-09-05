@@ -425,6 +425,8 @@ def analysis_page():
                         client = Anthropic(api_key=api_key)
 
                         prompt = f"""
+
+                
 Analyze this financial profile and provide recommendations:
 
 Name: {profile['name']}
@@ -441,11 +443,11 @@ Provide:
 4. Top 3 action items
 
 Be concise and specific.
-                        """
+"""
 
                         message = client.messages.create(
-                            model="claude-3-5-sonnet-20241022",
-                            max_tokens=1024,
+                            model="gpt-4o",
+                  max_tokens=1024,
                             messages=[{"role": "user", "content": prompt}]
                         )
 
