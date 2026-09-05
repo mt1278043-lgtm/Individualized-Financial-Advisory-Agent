@@ -497,33 +497,34 @@ def about_page():
     st.markdown("""
     ## Individualized Financial Advisory Agent
 
-    This application combines **LangGraph** and **Claude AI** to provide personalized financial advisory recommendations.
+   
+st.markdown("""
+This application combines **LangGraph** and **OpenAI GPT** to provide personalized financial advisory recommendations.
 
-    ### Features
-    - 📊 Portfolio analysis and recommendations
-    - 🏦 Retirement planning projections
-    - ⚠️ Risk assessment
-    - 💡 Personalized financial advice
+### Features
+- 📊 Portfolio analysis and recommendations
+- 🏦 Retirement planning projections
+- ⚠️ Risk assessment
+- 💡 Personalized financial advice
 
-    ### How It Works
-    1. Enter your financial information
-    2. The AI analyzes your profile across multiple dimensions
-    3. Receive personalized recommendations tailored to your needs
+### How It Works
+1. Enter your financial information
+2. The AI analyzes your profile across multiple dimensions
+3. Receive personalized recommendations tailored to your needs
 
-    ### Technology Stack
-    - **LangGraph**: Agent orchestration and workflow management
-    - **Claude 3.5 Sonnet**: AI-powered analysis and recommendations
-    - **Streamlit**: Web interface
-    - **Pydantic**: Data validation
+### Technology Stack
+- **LangGraph**: Agent orchestration and workflow management
+- **OpenAI GPT**: AI-powered analysis and recommendations
+- **Streamlit**: Web interface
+- **Pydantic**: Data validation
 
-    ### Disclaimer
-    This tool provides educational financial information only and is not a substitute for professional financial advice.
-    Consult with a certified financial advisor before making investment decisions.
+### Disclaimer
+This tool provides educational financial information only and is not a substitute for professional financial advice.
+Consult with a certified financial advisor before making investment decisions.
 
-    ---
-    *Built with ❤️ using Streamlit and Claude AI*
-    """)
-
+---
+*Built with ❤️ using Streamlit and OpenAI GPT*
+""")
     st.divider()
 
     col1, col2, col3 = st.columns(3)
