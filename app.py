@@ -69,7 +69,7 @@ def calculate_emergency_fund(monthly_expenses, months=6):
 # Page configuration
 st.set_page_config(
     page_title="Financial Advisory Agent",
-    page_icon="💰",
+    page_icon="$",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -152,7 +152,7 @@ def get_user_profile():
 
 def display_quick_metrics(profile):
     """Display quick financial metrics."""
-    st.subheader("💡 Quick Financial Metrics")
+    st.subheader("Quick Financial Metrics")
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -196,7 +196,7 @@ def display_quick_metrics(profile):
 def display_analysis_results(results):
     """Display analysis results in tabs."""
     tab1, tab2, tab3, tab4 = st.tabs(
-        ["📊 Portfolio", "🏦 Retirement", "⚠️ Risk Assessment", "✨ Recommendations"]
+        ["Portfolio", "Retirement", "Risk Assessment", "Recommendations"]
     )
 
     with tab1:
@@ -343,13 +343,13 @@ def main():
     initialize_session_state()
 
     # Header
-    st.markdown("# 💰 Individualized Financial Advisory Agent")
+    st.markdown("# Individualized Financial Advisory Agent")
     st.markdown("*Powered by LangGraph and OpenAI GPT-4*")
     st.divider()
 
     # Sidebar
     with st.sidebar:
-        st.header("📋 Navigation")
+        st.header("Navigation")
         page = st.radio("Select a page:", ["Dashboard", "Analysis", "About"])
 
     if page == "Dashboard":
@@ -362,21 +362,21 @@ def main():
 
 def dashboard_page():
     """Dashboard page."""
-    st.header("Dashboard")
+    st.header("Financial Dashboard")
     st.write("Welcome to your Financial Advisory Dashboard!")
 
     # Create two columns
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("📊 Your Financial Summary")
+        st.subheader("Your Financial Summary")
         if st.session_state.analysis_results:
             display_quick_metrics(st.session_state.user_profile)
         else:
-            st.info("👉 Go to 'Analysis' tab to generate your financial analysis")
+            st.info("Go to 'Analysis' tab to generate your financial analysis")
 
     with col2:
-        st.subheader("🎯 Recent Updates")
+        st.subheader("Recent Updates")
         st.write("- Portfolio analysis ready")
         st.write("- Retirement planning updated")
         st.write("- Risk assessment completed")
@@ -385,7 +385,7 @@ def dashboard_page():
 
     # Latest analysis
     if st.session_state.analysis_results:
-        st.subheader("📈 Latest Analysis Results")
+        st.subheader("Latest Analysis Results")
         display_analysis_results(st.session_state.analysis_results)
 
 
@@ -409,14 +409,14 @@ def analysis_page():
     col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
-        if st.button("🚀 Analyze My Finances", type="primary", use_container_width=True):
+        if st.button("Analyze My Finances", type="primary", use_container_width=True):
             st.session_state.show_results = True
             with st.spinner("Analyzing your financial profile..."):
                 try:
                     # Check if API key is set
                     api_key = os.getenv("OPENAI_API_KEY")
                     if not api_key:
-                        st.error("⚠️ OPENAI_API_KEY not found!\n\n**To add it:**\n\n1. **Streamlit Cloud**: Go to App settings → Secrets → Add OPENAI_API_KEY\n2. **Local**: Set `export OPENAI_API_KEY='your-key'` in terminal")
+                        st.error("OPENAI_API_KEY not found!\n\n**To add it:**\n\n1. **Streamlit Cloud**: Go to App settings → Secrets → Add OPENAI_API_KEY\n2. **Local**: Create .env file with OPENAI_API_KEY=your-key")
                         return
 
                     # Try to use full AI analysis with OpenAI
@@ -467,12 +467,12 @@ Be concise and specific.
                         results["final_recommendation"]["confidence"] = "medium"
 
                     st.session_state.analysis_results = results
-                    st.success("✅ Analysis complete!")
+                    st.success("Analysis complete!")
                 except Exception as e:
-                    st.error(f"❌ Error: {str(e)}")
+                    st.error(f"Error: {str(e)}")
 
     with col2:
-        if st.button("🔄 Reset", use_container_width=True):
+        if st.button("Reset", use_container_width=True):
             st.session_state.show_results = False
             st.session_state.analysis_results = None
             st.rerun()
@@ -488,7 +488,7 @@ Be concise and specific.
         st.divider()
         results_json = json.dumps(st.session_state.analysis_results, indent=2, default=str)
         st.download_button(
-            label="📥 Download Analysis as JSON",
+            label="Download Analysis as JSON",
             data=results_json,
             file_name=f"financial_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
             mime="application/json"
@@ -505,10 +505,10 @@ def about_page():
     This application combines **LangGraph** and **OpenAI GPT-4** to provide personalized financial advisory recommendations.
 
     ### Features
-    - 📊 Portfolio analysis and recommendations
-    - 🏦 Retirement planning projections
-    - ⚠️ Risk assessment
-    - 💡 Personalized financial advice
+    - Portfolio analysis and recommendations
+    - Retirement planning projections
+    - Risk assessment
+    - Personalized financial advice
 
     ### How It Works
     1. Enter your financial information
@@ -526,7 +526,7 @@ def about_page():
     Consult with a certified financial advisor before making investment decisions.
 
     ---
-    *Built with ❤️ using Streamlit and Claude AI*
+    *Built with care using Streamlit and OpenAI*
     """)
 
    
@@ -561,11 +561,11 @@ Consult with a certified financial advisor before making investment decisions.
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.info("📚 **Learn More**: Visit our GitHub repository")
+        st.info("[Learn More] Visit our GitHub repository")
     with col2:
-        st.warning("⚠️ **Disclaimer**: Not a substitute for professional advice")
+        st.warning("[Disclaimer] Not a substitute for professional advice")
     with col3:
-        st.success("✅ **Privacy**: Your data is processed locally")
+        st.success("[Privacy] Your data is processed locally")
 
 
 if __name__ == "__main__":
