@@ -9,8 +9,8 @@ from src.models.financial import UserProfile, RiskTolerance, FinancialGoal
 def load_environment():
     """Load environment variables."""
     load_dotenv()
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        raise ValueError("ANTHROPIC_API_KEY environment variable not set")
+    if not os.getenv("OPENAI_API_KEY"):
+        raise ValueError("OPENAI_API_KEY environment variable not set")
 
 
 def example_user_profile() -> dict:

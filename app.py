@@ -344,7 +344,7 @@ def main():
 
     # Header
     st.markdown("# 💰 Individualized Financial Advisory Agent")
-    st.markdown("*Powered by LangGraph and Claude AI*")
+    st.markdown("*Powered by LangGraph and OpenAI GPT-4*")
     st.divider()
 
     # Sidebar
@@ -414,15 +414,15 @@ def analysis_page():
             with st.spinner("Analyzing your financial profile..."):
                 try:
                     # Check if API key is set
-                    api_key = os.getenv("ANTHROPIC_API_KEY")
+                    api_key = os.getenv("OPENAI_API_KEY")
                     if not api_key:
-                        st.error("⚠️ ANTHROPIC_API_KEY not found!\n\n**To add it:**\n\n1. **Streamlit Cloud**: Go to App settings → Secrets → Add ANTHROPIC_API_KEY\n2. **Local**: Set `export ANTHROPIC_API_KEY='your-key'` in terminal")
+                        st.error("⚠️ OPENAI_API_KEY not found!\n\n**To add it:**\n\n1. **Streamlit Cloud**: Go to App settings → Secrets → Add OPENAI_API_KEY\n2. **Local**: Set `export OPENAI_API_KEY='your-key'` in terminal")
                         return
 
-                    # Try to use full AI analysis with Anthropic
+                    # Try to use full AI analysis with OpenAI
                     try:
-                        from anthropic import Anthropic
-                        client = Anthropic(api_key=api_key)
+                        from openai import OpenAI
+                        client = OpenAI(api_key=api_key)
 
                         prompt = f"""
 Analyze this financial profile and provide recommendations:
@@ -443,13 +443,13 @@ Provide:
 Be concise and specific.
                         """
 
-                        message = client.messages.create(
-                            model="claude-3-5-sonnet-20241022",
+                        response = client.chat.completions.create(
+                            model="gpt-4",
                             max_tokens=1024,
                             messages=[{"role": "user", "content": prompt}]
                         )
 
-                        ai_recommendation = message.content[0].text
+                        ai_recommendation = response.choices[0].message.content
                         results = generate_basic_analysis(profile)
                         results["final_recommendation"]["recommendation"] = ai_recommendation
                         results["final_recommendation"]["confidence"] = "high"
@@ -495,7 +495,7 @@ def about_page():
     st.markdown("""
     ## Individualized Financial Advisory Agent
 
-    This application combines **LangGraph** and **Claude AI** to provide personalized financial advisory recommendations.
+    This application combines **LangGraph** and **OpenAI GPT-4** to provide personalized financial advisory recommendations.
 
     ### Features
     - 📊 Portfolio analysis and recommendations
@@ -510,7 +510,7 @@ def about_page():
 
     ### Technology Stack
     - **LangGraph**: Agent orchestration and workflow management
-    - **Claude 3.5 Sonnet**: AI-powered analysis and recommendations
+    - **OpenAI GPT-4**: AI-powered analysis and recommendations
     - **Streamlit**: Web interface
     - **Pydantic**: Data validation
 
