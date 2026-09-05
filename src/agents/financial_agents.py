@@ -1,5 +1,5 @@
 """Financial advisory agents."""
-from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain.tools import tool
 from src.tools.financial_tools import (
     calculate_retirement_needs,
@@ -81,20 +81,20 @@ def project_retirement_income(
 
 def create_portfolio_agent():
     """Create portfolio analysis agent."""
-    llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
+    llm = ChatOpenAI(model="gpt-4")
     tools = [get_portfolio_recommendation, assess_financial_health]
     return llm.bind_tools(tools)
 
 
 def create_retirement_agent():
     """Create retirement planning agent."""
-    llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
+    llm = ChatOpenAI(model="gpt-4")
     tools = [analyze_retirement_needs, project_retirement_income]
     return llm.bind_tools(tools)
 
 
 def create_risk_assessment_agent():
     """Create risk assessment agent."""
-    llm = ChatAnthropic(model="claude-3-5-sonnet-20241022")
+    llm = ChatOpenAI(model="gpt-4")
     tools = [assess_financial_health]
     return llm.bind_tools(tools)
