@@ -425,6 +425,8 @@ def analysis_page():
                         client = OpenAI(api_key=api_key)
 
                         prompt = f"""
+
+                
 Analyze this financial profile and provide recommendations:
 
 Name: {profile['name']}
@@ -441,11 +443,16 @@ Provide:
 4. Top 3 action items
 
 Be concise and specific.
-                        """
+"""
 
-                        response = client.chat.completions.create(
+                        response = client.chat.completi
+  
+  ons.create(
                             model="gpt-4",
                             max_tokens=1024,
+                        message = client.messages.create(
+                            model="gpt-4o",
+                  max_tokens=1024,
                             messages=[{"role": "user", "content": prompt}]
                         )
 
@@ -522,6 +529,34 @@ def about_page():
     *Built with ❤️ using Streamlit and Claude AI*
     """)
 
+   
+st.markdown("""
+This application combines **LangGraph** and **OpenAI GPT** to provide personalized financial advisory recommendations.
+
+### Features
+- 📊 Portfolio analysis and recommendations
+- 🏦 Retirement planning projections
+- ⚠️ Risk assessment
+- 💡 Personalized financial advice
+
+### How It Works
+1. Enter your financial information
+2. The AI analyzes your profile across multiple dimensions
+3. Receive personalized recommendations tailored to your needs
+
+### Technology Stack
+- **LangGraph**: Agent orchestration and workflow management
+- **OpenAI GPT**: AI-powered analysis and recommendations
+- **Streamlit**: Web interface
+- **Pydantic**: Data validation
+
+### Disclaimer
+This tool provides educational financial information only and is not a substitute for professional financial advice.
+Consult with a certified financial advisor before making investment decisions.
+
+---
+*Built with ❤️ using Streamlit and OpenAI GPT*
+""")
     st.divider()
 
     col1, col2, col3 = st.columns(3)
